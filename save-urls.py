@@ -22,28 +22,23 @@ def save_url(driver, url):
     driver.save_screenshot('screenshot-{}.png'.format(quote_plus(url)))
 
 def take_url(conn):
-    cur = conn.cursor()
-    try:
-        cur.execute("BEGIN EXCLUSIVE TRANSACTION")
-        cur.execute("SELECT url FROM queue WHERE when_push IS NULL")
+    with conn: # transaction (TODO - should be exclusive)
+        cur = conn.cursor()
+        cur.execute("SELECT url FROM queue WHERE when_pop IS NULL LIMIT 1;")
         rows = cur.fetchall()
-        if not rows:
+        if rows:
+            [[url]] = rows
+            cur.execute("UPDATE queue SET when_pop = CURRENT_TIMESTAMP WHERE url = ?;", (url,))
+            logging.info("Taken url %s", url)
+            return url
+        else:
             logging.info("No more work to do")
             return None
-        [[url]] = rows
-        cur.execute("UPDATE queue SET when_pop = CURRENT_TIMESTAMP WHERE url = ?", (url,))
-        logging.info("Taken url %s", url)
-        return url
-    except Exception:
-        cur.execute("ROLLBACK TRANSACTION")
-        raise
-    finally:
-        cur.execute("COMMIT TRANSACTION")
 
 def finished_url(conn, url):
     with conn: # transaction
         cur = conn.cursor()
-        cur.execute("UPDATE queue SET when_finished = CURRENT_TIMESTAMP WHERE url = ?", (url,))
+        cur.execute("UPDATE queue SET when_finished = CURRENT_TIMESTAMP WHERE url = ?;", (url,))
 
 def main():
     driver = get_driver()
@@ -60,4 +55,5 @@ def main():
     driver.close()
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()
