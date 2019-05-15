@@ -31,9 +31,9 @@ And you also need:
 apt install chromedriver
 ```
 
-And run with:
+A worker will run until there are no more urls in the queue:
 
 ```
 Xvfb :99 -ac &
-DISPLAY=:99 env/bin/python save_urls.py <<< https://dbatley.com/
+DISPLAY=:99 python save-urls.py
 ```
