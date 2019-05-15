@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from urllib import quote_plus
+from time import sleep
 import sys
 
 def save_url(driver, url):
@@ -11,7 +12,12 @@ def save_url(driver, url):
     driver.save_screenshot('screenshot-{}.png'.format(quote_plus(url)))
 
 def main():
-    driver = webdriver.Firefox()
+    # Maybe works:
+    # driver = webdriver.PhantomJS(service_log_path="/tmp/wayb-pjs.log")
+    # But there's no geckodriver debian package:
+    # driver = webdriver.Firefox(service_log_path="/tmp/wayb-ff.log")
+    # Works great, but needs a fake X11 buffer `Xvfb :99 -ac`
+    driver = webdriver.Chrome(service_log_path="/tmp/wayb-ch.log")
     for url in sys.stdin:
         save_url(driver, url)
     driver.close()
