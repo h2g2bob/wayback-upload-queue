@@ -19,7 +19,7 @@ def save_url(driver, url):
     for _ in range(12):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         sleep(10)
-    driver.save_screenshot('screenshot-{}.png'.format(quote_plus(url)))
+    driver.save_screenshot('screenshots/screenshot-{}.png'.format(quote_plus(url)))
 
 def take_url(conn):
     with conn: # transaction (TODO - should be exclusive)
