@@ -30,6 +30,8 @@ Why yes, like:
 ```
 env/bin/pip install requests
 env/bin/python extract_urls/democlub.py | env/bin/python add-to-queue.py
+env/bin/python extract_urls/democlub-by-scraping.py | grep -vF -e democracyclub.org.uk -e whocanivotefor.co.uk | env/bin/python add-to-queue.py
+sh extract_urls/electionleaflets.sh | env/bin/python add-to-queue.py
 ```
 
 ## Save to the Wayback Machine
